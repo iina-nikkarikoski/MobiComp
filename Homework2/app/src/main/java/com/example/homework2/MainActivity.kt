@@ -33,6 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.material3.Button
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 
@@ -48,12 +52,6 @@ class MainActivity : ComponentActivity() {
 }
 
 data class Message(val author: String, val body: String)
-
-val navController = rememberNavController()
-Fragment.findNavController()
-val navHostFragment =
-    supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-val navController = navHostFragment.navController
 
 @Composable
 fun MessageCard(msg: Message) {
@@ -132,6 +130,33 @@ fun PreviewConversation() {
     Homework2Theme {
         Conversation(SampleData.conversationSample)
     }
+}
+// Define the Profile composable.
+@Composable
+fun Profile(onNavigateToFriendsList: () -> Unit) {
+    Text("Profile")
+    Button(onClick = { onNavigateToFriendsList() }) {
+        Text("Go to Friends List")
+    }
+}
+
+// Define the FriendsList composable.
+@Composable
+fun FriendsList(onNavigateToProfile: () -> Unit) {
+    Text("Friends List")
+    Button(onClick = { onNavigateToProfile() }) {
+        Text("Go to Profile")
+    }
+}
+
+@Composable
+fun Navigation() {
+    val navController = rememberNavController()
+    NavHost(navController, startDestination = "profile") {
+        composable("profile") { Profile(onNavigateToFriendsList = { navController.navigate("friendslist") }) }
+        composable("friendslist") { FriendsList(onNavigateToProfile = { navController.navigate("profile") }) }
+    }
+
 }
 
 
