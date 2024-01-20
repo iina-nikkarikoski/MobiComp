@@ -49,12 +49,6 @@ class MainActivity : ComponentActivity() {
 
 data class Message(val author: String, val body: String)
 
-/*val navController = rememberNavController()
-Fragment.findNavController()
-val navHostFragment =
-    supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-val navController = navHostFragment.navController*/
-
 @Composable
 fun MessageCard(msg: Message) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
@@ -134,7 +128,10 @@ fun PreviewConversation() {
     }
 }
 
-
+@Composable
+fun Navigation() {
+    val navController = rememberNavController()
+}
 
 
 
