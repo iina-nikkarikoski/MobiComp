@@ -49,11 +49,11 @@ class MainActivity : ComponentActivity() {
 
 data class Message(val author: String, val body: String)
 
-val navController = rememberNavController()
+/*val navController = rememberNavController()
 Fragment.findNavController()
 val navHostFragment =
     supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-val navController = navHostFragment.navController
+val navController = navHostFragment.navController*/
 
 @Composable
 fun MessageCard(msg: Message) {
