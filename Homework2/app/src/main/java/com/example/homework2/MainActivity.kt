@@ -131,6 +131,11 @@ fun PreviewConversation() {
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "profile") {
+        composable("profile") { Profile( /* ... */ ) }
+        composable("friendslist") { FriendsList( /* ... */ ) }
+        // Add more destinations similarly.
+    }
 }
 
 
