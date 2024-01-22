@@ -69,6 +69,7 @@ dependencies {
 
     val nav_version = "2.7.6"
 
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
     // Java language implementation
     implementation("androidx.navigation:navigation-fragment:$nav_version")
     implementation("androidx.navigation:navigation-ui:$nav_version")
