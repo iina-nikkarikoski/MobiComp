@@ -5,6 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,11 +28,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 data class Message(val author: String, val body: String)
+@Composable
+fun Settings(navController: NavController) {
+    Button(onClick = {navController.popBackStack()},
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text("Profile Settings")
+    }
+}
+
 @Composable
 fun MessageScreen(
     navController: NavController,
@@ -38,11 +50,12 @@ fun MessageScreen(
 ) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
-            modifier = Modifier.clickable {
-                navController.navigate(route = Screen.SecondScreen.route) }
+            modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .clickable { navController.navigate(route = Screen.SecondScreen.route) },
+
             painter = painterResource(R.drawable.pinkie),
             contentDescription = null
         )
@@ -78,6 +91,8 @@ fun MessageScreen(
     }
 }
 
+
+
 /*@Preview(name = "Light Mode")
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -85,16 +100,6 @@ fun MessageScreen(
     name = "Dark Mode"
 )*/
 
-/*@Composable
-fun PreviewMessageCard() {
-    Homework2Theme {
-        Surface {
-            MessageScreen(
-                msg = Message("Pinkie", "Hey, take a look at Jetpack Compose, it's great!")
-            )
-        }
-    }
-}*/
 
 @Composable
 fun Conversation(navController: NavController, messages: List<Message>) {
@@ -108,13 +113,11 @@ fun Conversation(navController: NavController, messages: List<Message>) {
     }
 }
 
-/*@Preview
+@Preview(showBackground = true)
 @Composable
 fun PreviewConversation() {
-    Homework2Theme {
-        Conversation(SampleData.conversationSample)
-    }
-}*/
+    Conversation(navController = rememberNavController(), messages = SampleData.conversationSample)
+}
 
 
 /**
