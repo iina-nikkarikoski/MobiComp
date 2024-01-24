@@ -1,14 +1,17 @@
 package com.example.homework2
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,7 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,37 +32,57 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 data class Message(val author: String, val body: String)
 @Composable
-fun Settings(navController: NavController) {
-    Button(onClick = {navController.popBackStack()},
-        modifier = Modifier.padding(16.dp)
+fun Settings(title: String, onSettingsClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(color = Color.Magenta)
     ) {
-        Text("Profile Settings")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = Color.White,
+                fontSize = 20.sp,
+                letterSpacing = 0.5.sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = Color.White
+                )
+            }
+        }
     }
 }
-
 @Composable
-fun MessageScreen(
-    navController: NavController,
-    msg: Message
-) {
+fun MessageScreen(msg: Message) {
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                .clickable { navController.navigate(route = Screen.SecondScreen.route) },
-
+                .border(1.5.dp, Color.Black, CircleShape),
             painter = painterResource(R.drawable.pinkie),
             contentDescription = null
         )
@@ -90,8 +117,17 @@ fun MessageScreen(
         }
     }
 }
-
-
+@Composable
+fun Conversation(navController: NavController, messages: List<Message>) {
+    Column {
+        Settings(title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
+        LazyColumn {
+            items(messages) { message ->
+                MessageScreen(message)
+            }
+        }
+    }
+}
 
 /*@Preview(name = "Light Mode")
 @Preview(
@@ -99,26 +135,11 @@ fun MessageScreen(
     showBackground = true,
     name = "Dark Mode"
 )*/
-
-
-@Composable
-fun Conversation(navController: NavController, messages: List<Message>) {
-    LazyColumn {
-        items(messages) { message ->
-            MessageScreen(
-                navController = rememberNavController(),
-                message
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewConversation() {
     Conversation(navController = rememberNavController(), messages = SampleData.conversationSample)
 }
-
 
 /**
  * SampleData for Jetpack Compose Tutorial
