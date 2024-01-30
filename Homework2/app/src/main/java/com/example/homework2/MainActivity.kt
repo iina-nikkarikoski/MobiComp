@@ -49,5 +49,7 @@ class MainActivity : ComponentActivity() {
                 Navigation(navController = navController)
             }
         }
+
+        val context = this
     }
 }
