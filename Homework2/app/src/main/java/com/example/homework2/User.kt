@@ -4,7 +4,7 @@ package com.example.homework2
 //import androidx.room.PrimaryKey
 
 //@Entity(tableName = "images")
-data class User {
+/*data class User {
 
     //@PrimaryKey(autoGenerate = true) val id: Int = 0,
 
@@ -15,4 +15,4 @@ data class User {
         this.name  = name;
         this.picture = picture
     }
-}
+}*/

@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 
-val DATABASE_NAME = "MyDB"
+/*val DATABASE_NAME = "MyDB"
 val TABLE_NAME = "User"
 val COL_NAME = "name"
 val COL_PICTURE = "picture"
@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
 @Database(entities = [ImageData::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun imageDao(): ImageDao
-}
+}*/
 /*class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         val createTable = "CREATE TABLE " + TABLE_NAME + " (" +
