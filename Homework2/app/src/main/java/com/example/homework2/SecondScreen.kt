@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -36,18 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
-
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun SecondScreen(navController: NavHostController) {
+fun SecondScreen(navController: NavHostController, db: AppDatabase?, userRepository: UserRepository) {
 
     var text by remember { mutableStateOf("PINKIE") }
     var uri by remember { mutableStateOf<Uri?>(null) }
+    val userDao = db?.userDao()
+    val viewModel = UserViewModel(userRepository)
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -66,6 +66,7 @@ fun SecondScreen(navController: NavHostController) {
                 contentDescription = "Back",
                 tint = Color.White
             )
+
         }
     }
 
@@ -82,12 +83,20 @@ fun SecondScreen(navController: NavHostController) {
                     .size(200.dp)
                     .clip(CircleShape)
                     .border(1.5.dp, Color.Black, CircleShape)
-                    .clickable(onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }),
-                painter = painterResource(R.drawable.pinkie),
+                    .clickable(onClick = {
+                        photoPicker.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    }),
+                painter = if(uri == null){
+                     painterResource(R.drawable.pinkie)
+                } else {
+                    rememberAsyncImagePainter(uri)
+                },
                 contentDescription = null,
             )
-
-            AsyncImage(model = uri, contentDescription = null)
 
             /*Spacer(modifier = Modifier.height(10.dp))
 
@@ -108,42 +117,26 @@ fun SecondScreen(navController: NavHostController) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier
+        .fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                uri?.let {
+                    viewModel.saveUser(text, it.toString())
+                }
+            },
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta)
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
+            modifier = Modifier.padding(20.dp)
         ) {
             Text(text = "SAVE")
         }
     }
 }
 
-@Composable
-fun PhotoPicker() {
-    var uri by remember { mutableStateOf<Uri?>(null) }
-
-    val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri = it }
-    )
-
-    Column {
-        Button(
-            onClick = {
-                photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            }
-        ) {
-            Text(text = "open gallery")
-        }
-
-        AsyncImage(model = uri, contentDescription = null)
-    }
-}
-
-@Composable
+/*@Composable
 @Preview(showBackground = true)
 fun ScreenPreview() {
-    SecondScreen(navController = rememberNavController())
-}
+    SecondScreen(navController = rememberNavController(), null, null)
+}*/

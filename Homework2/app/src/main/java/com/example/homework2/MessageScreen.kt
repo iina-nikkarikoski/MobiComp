@@ -1,6 +1,7 @@
 package com.example.homework2
 
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -42,8 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 
 data class Message(val author: String, val body: String)
+
 @Composable
 fun Settings(title: String, onSettingsClick: () -> Unit) {
     Box(
@@ -84,6 +87,11 @@ fun MessageScreen(msg: Message) {
                 .clip(CircleShape)
                 .border(1.5.dp, Color.Black, CircleShape),
             painter = painterResource(R.drawable.pinkie),
+            /*painter = if(uri == null){
+                painterResource(R.drawable.pinkie)
+            } else {
+                rememberAsyncImagePainter(uri)
+            },*/
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -122,7 +130,7 @@ fun Conversation(navController: NavController, messages: List<Message>) {
     Column {
         Settings(title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
         LazyColumn {
-            items(messages) { message ->
+            items(messages, key = {message -> message.author}) { message ->
                 MessageScreen(message)
             }
         }

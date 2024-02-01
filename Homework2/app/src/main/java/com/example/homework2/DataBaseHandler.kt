@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 
+
+
 /*val DATABASE_NAME = "MyDB"
 val TABLE_NAME = "User"
 val COL_NAME = "name"
