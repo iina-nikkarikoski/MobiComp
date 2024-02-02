@@ -85,7 +85,7 @@ dependencies {
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
-    //ksp("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
     // optional - RxJava2 support for Room
@@ -103,7 +103,7 @@ dependencies {
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
 
-    //implementation(ksp("androidx.room:room-compiler:2.5.0"))
+    ksp("androidx.room:room-compiler:2.5.0")
 
     //photo-picker
     implementation("io.coil-kt:coil-compose:2.5.0")

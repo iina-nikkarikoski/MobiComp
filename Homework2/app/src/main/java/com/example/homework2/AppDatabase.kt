@@ -1,12 +1,12 @@
 package com.example.homework2
 
-import android.content.ContentValues
-import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import android.widget.Toast
+import androidx.room.Database
+import androidx.room.RoomDatabase
 
-
+@Database(entities = [User::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao() : UserDao
+}
 
 /*val DATABASE_NAME = "MyDB"
 val TABLE_NAME = "User"

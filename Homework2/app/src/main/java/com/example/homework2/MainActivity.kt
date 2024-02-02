@@ -22,6 +22,8 @@ class MainActivity : ComponentActivity() {
                     AppDatabase::class.java, "users_database"
                 ).build()
 
+                //by lazy { room....
+
                 Navigation(navController = navController, db)
 
             }
