@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun Navigation(navController: NavHostController, db: AppDatabase) {
+fun Navigation(navController: NavHostController, db: AppDatabase, userRepository: Any) {
 
     NavHost(navController = navController, startDestination = Screen.MessageScreen.route) {
         composable(route = Screen.MessageScreen.route) {

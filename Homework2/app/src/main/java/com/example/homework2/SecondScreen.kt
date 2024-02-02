@@ -48,7 +48,6 @@ fun SecondScreen(navController: NavHostController, db: AppDatabase?, userReposit
 
     var text by remember { mutableStateOf("PINKIE") }
     var uri by remember { mutableStateOf<Uri?>(null) }
-    val userDao = db?.userDao()
     val viewModel = UserViewModel(userRepository)
 
     val photoPicker = rememberLauncherForActivityResult(
