@@ -1,10 +1,13 @@
 package com.example.homework2
 
-class UserRepository(private val userDao: UserDao?) {
+import androidx.lifecycle.LiveData
 
-    //val allUsers: Flow<List<User>>? = userDao?.getAllNotes()
-
+class UserRepository(private val userDao: UserDao) {
     suspend fun insert(user: User) {
-        userDao?.insert(user)
+        userDao.insert(user)
     }
+    suspend fun update(user: User) {
+        userDao.update(user)
+    }
+    fun getAllUsers(): LiveData<List<User>> = userDao.getAllUsers()
 }

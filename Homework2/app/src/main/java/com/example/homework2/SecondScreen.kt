@@ -39,16 +39,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun SecondScreen(navController: NavHostController, db: AppDatabase?, userRepository: UserRepository) {
+fun SecondScreen(navController: NavHostController) {
 
     var text by remember { mutableStateOf("PINKIE") }
     var uri by remember { mutableStateOf<Uri?>(null) }
-    val viewModel = UserViewModel(userRepository)
+    val viewModel: UserViewModel = viewModel()
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -99,15 +100,6 @@ fun SecondScreen(navController: NavHostController, db: AppDatabase?, userReposit
                 contentDescription = null,
             )
 
-            /*Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                modifier = Modifier.padding(start = 75.dp),
-                text = "PINKIE",
-                color = Color.Black,
-                style = MaterialTheme.typography.titleLarge
-            )*/
-
             Spacer(modifier = Modifier.height(25.dp))
 
             OutlinedTextField(
@@ -123,9 +115,8 @@ fun SecondScreen(navController: NavHostController, db: AppDatabase?, userReposit
         contentAlignment = Alignment.BottomCenter) {
         Button(
             onClick = {
-                uri?.let {
-                    viewModel.saveUser(text, it.toString())
-                }
+                val user = User(name = text, picture = uri.toString())
+                viewModel.addUser(user)
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
@@ -136,8 +127,8 @@ fun SecondScreen(navController: NavHostController, db: AppDatabase?, userReposit
     }
 }
 
-/*@Composable
+@Composable
 @Preview(showBackground = true)
 fun ScreenPreview() {
-    SecondScreen(navController = rememberNavController(), null, UserRepository(null))
-}*/
+    SecondScreen(navController = rememberNavController())
+}

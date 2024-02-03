@@ -1,5 +1,6 @@
 package com.example.homework2
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -14,5 +15,5 @@ interface UserDao {
     @Update
     suspend fun update(user: User)
     @Query("SELECT * FROM users")
-    fun getAllNotes(): Flow<List<User>>
+    fun getAllUsers(): LiveData<List<User>>
 }
