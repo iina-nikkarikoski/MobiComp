@@ -1,6 +1,5 @@
 package com.example.homework2
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -8,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [User::class], version = 1)
 abstract class RoomDatabase : RoomDatabase() {
-    abstract fun DAO() : UserDao
+    abstract fun userDao() : UserDao
     companion object {
         @Volatile
         private var INSTANCE: RoomDatabase? = null

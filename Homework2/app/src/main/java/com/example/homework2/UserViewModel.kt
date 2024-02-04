@@ -11,8 +11,11 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
     private val repository: UserRepository
     private val readAll : LiveData<List<User>>
     init {
-        val userDB = RoomDatabase.getDatabase(application).DAO()
-        repository = UserRepository(userDB)
+        //val userDB = RoomDatabase.getDatabase(application).userDao()
+        //repository = UserRepository(userDB)
+        val userDB : RoomDatabase = RoomDatabase.getDatabase(application)
+        val dao = UserRepository(userDB.userDao())
+        repository = dao
         readAll = repository.getAllUsers()
     }
 
