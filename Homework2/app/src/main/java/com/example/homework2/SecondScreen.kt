@@ -50,6 +50,7 @@ fun SecondScreen(navController: NavHostController) {
     var text by remember { mutableStateOf("PINKIE") }
     var uri by remember { mutableStateOf<Uri?>(null) }
     val viewModel: UserViewModel = viewModel()
+    //val userProfile by UserViewModel.user.observeAsState()
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
