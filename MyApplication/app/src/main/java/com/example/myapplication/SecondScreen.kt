@@ -157,8 +157,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
             Text(text = "SAVE")
         }
 
-        //Conversation(navController = navController, messages = SampleData.conversationSample, lastUserName)
-
         Text(
             text = "Text from the database: $lastUserName",
             modifier = Modifier.padding(top = 16.dp)
