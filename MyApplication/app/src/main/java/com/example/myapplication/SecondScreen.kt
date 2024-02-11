@@ -1,8 +1,13 @@
 package com.example.myapplication
 
+import android.R
 import android.content.Context
+import android.content.ContextWrapper
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.ImageView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,19 +39,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import java.io.File
+
 
 
 
@@ -56,17 +65,42 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     var text by remember { mutableStateOf("") }
     var uri by remember { mutableStateOf<Uri?>(null) }
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
-    val lastUserName = allUsers.lastOrNull()?.name ?: "DefaultUserName"
+    val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
+    var savedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri = it }
     )
+    val context = LocalContext.current
+
+    /*val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { selectedUri ->
+            uri = saveImageToStorage(context, selectedUri)
+        }
+    )*/
     /*val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
-            // Store the image URI in the app's data directory
-            StoreImageUri(context, uri)
+            if (uri != null) {
+                Log.d("PhotoPicker", "Selected URI: $uri")
+                val copiedFile = imageToStorage(context, context.contentResolver, uri)
+                if (copiedFile != null) {
+                    Log.d("PhotoPicker", "Image copied to internal storage: ${copiedFile.absolutePath}")
+                    state.description.value = copiedFile.absolutePath
+                    selectedImage = copiedFile
+                }
+
+                state.description.value?.let {filePath ->
+                    val profilePic = File(filePath)
+                    Image(
+                        painter = rememberImagePainter(profilePic),
+                        contentDescription = "Profile picture",
+
+                    )
+                }
+            }
         }
     )*/
 
@@ -89,8 +123,10 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column(modifier = Modifier.wrapContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.wrapContentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Spacer(modifier = Modifier.height(100.dp))
 
             Image(
@@ -105,11 +141,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                             )
                         )
                     }),
-                painter = if(uri == null){
-                     painterResource(R.drawable.pinkie)
-                } else {
-                    rememberAsyncImagePainter(uri)
-                },
+                painter = rememberAsyncImagePainter(uri),
                 contentDescription = null,
             )
 
@@ -118,37 +150,25 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                /*onValueChange = { newText ->
-                    // Update the text value as it changes
-                    text = newText
-
-                    // Automatically save to the database
-                    val user = User(name = newText, picture = uri.toString())
-                    viewModel.insert(user)
-                },*/
-                label = { Text("Change name")}
+                label = { Text("Change name") }
             )
         }
     }
 
 
-    Box(modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
         Button(
             onClick = {
+                //savedUri = saveImageToStorage(context, uri)
                 val user = User(name = text, picture = uri.toString())
                 viewModel.insert(user)
+                //uri = savedUri
                 Log.d("Saving user", "User saved to database")
-
-                /*// Fetch the stored image URI
-                val storedImageUri = fetchStoredImageUri()
-
-                // Create a User object with the name and stored image URI
-                val user = User(name = text, picture = storedImageUri?.toString())
-
-                // Insert the user into the database
-                viewModel.insert(user)*/
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
@@ -163,34 +183,61 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         )
     }
 }
+/*fun saveImageToStorage(context: Context, imageUri: Uri?): Uri? {
+    if (imageUri == null) {
+        return null
+    }
 
-// Function to store the image URI
-/*@Composable
-private fun StoreImageUri(context: Context, uri: Uri?) {
-    uri?.let {
-        val fileName = "stored_image.txt"
-        // Write the image URI to a file in the app's internal storage
-        LocalContext.current.openFileOutput(fileName, Context.MODE_PRIVATE).use { output ->
-            output.write(uri.toString().toByteArray())
+    // Create a unique filename for the image
+    val filename = "user_image_${System.currentTimeMillis()}.jpg"
+
+    try {
+        // Open an output stream to the app's files directory
+        context.openFileOutput(filename, Context.MODE_PRIVATE).use { outputStream ->
+            // Get the input stream from the image URI
+            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                // Copy the image data from the input stream to the output stream
+                inputStream.copyTo(outputStream)
+            }
         }
+
+        // Return the saved image URI using FileProvider
+        return FileProvider.getUriForFile(context, "${context.packageName}.provider", File(context.filesDir, filename))
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return null
     }
-}
+}*/
 
-// Function to fetch the stored image URI
-@Composable
-private fun fetchStoredImageUri(): Uri? {
-    val fileName = "stored_image.txt"
-    var imageUri: Uri? = null
+/*fun loadImageFromStorage(context: Context, imageUri: Uri?): Painter {
+    return rememberDrawablePainter(imageUri)
+}*/
 
-    // Read the image URI from the file in the app's internal storage
-    LocalContext.current.openFileInput(fileName).use { input ->
-        val bytes = ByteArray(input.available())
-        input.read(bytes)
-        val uriString = String(bytes)
-        imageUri = Uri.parse(uriString)
+/*fun saveImageToStorage(context: Context, imageUri: Uri?): Uri? {
+    if (imageUri == null) {
+        return null
     }
 
-    return imageUri
+    // Create a unique filename for the image
+    val filename = "user_image_${System.currentTimeMillis()}.jpg"
+
+    // Open an output stream to the app's files directory
+    val outputStream: OutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)
+
+    // Get the input stream from the image URI
+    val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
+
+    // Copy the image data from the input stream to the output stream
+    inputStream?.copyTo(outputStream)
+
+    // Close the streams
+    inputStream?.close()
+    outputStream.close()
+
+    Log.d("Saving image", "image saved to database")
+
+    // Return the saved image URI
+    return Uri.fromFile(File(context.filesDir, filename))
 }*/
 
 /*@Composable

@@ -137,16 +137,17 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String) {
 }
 @Composable
 fun Conversation(navController: NavController, messages: List<Message>, viewModel: UserViewModel) {
-    val latestUserName by viewModel.latestUserName.observeAsState() /////////////////////////////
+    val allUsers by viewModel.allUsers.observeAsState(emptyList())
+    val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
     Column {
         Settings(title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
         LazyColumn {
             items(messages) { message ->
                 val uniqueKey = "${message.author}_${message.hashCode()}"
-                if (latestUserName?.isEmpty() == true) {
+                /*if (lastUserName?.isEmpty() == true) {
                     MessageScreen(message, "Pinkie", uniqueKey)
-                }
-                MessageScreen(message, latestUserName, uniqueKey)
+                }*/
+                MessageScreen(message, lastUserName, uniqueKey)
             }
         }
         /*LazyColumn {
