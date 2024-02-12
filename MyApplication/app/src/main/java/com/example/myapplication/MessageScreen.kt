@@ -43,6 +43,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 
 
 data class Message(val author: String, val body: String)
@@ -86,20 +87,25 @@ fun Settings(title: String, onSettingsClick: () -> Unit) {
         }
     }
 }
+
 @Composable
-fun MessageScreen(msg: Message, latestUserName: String?,  key: String) {
+fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel: UserViewModel) {
+
+    val allUsers by viewModel.allUsers.observeAsState(emptyList())
+    var profilePic = allUsers.lastOrNull()?.picture.toString()
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
                 .border(1.5.dp, Color.Black, CircleShape),
-            painter = painterResource(R.drawable.pinkie),
+            //painter = painterResource(R.drawable.pinkie),
             //painter = rememberAsyncImagePainter(profilePicture),
-            /*painter = if(uri == null){
+            painter = rememberAsyncImagePainter(profilePic),
+            /*if(profilePic == null){
                 painterResource(R.drawable.pinkie)
             } else {
-                rememberAsyncImagePainter(uri)
+
             },*/
             contentDescription = null
         )
@@ -147,7 +153,7 @@ fun Conversation(navController: NavController, messages: List<Message>, viewMode
                 /*if (lastUserName?.isEmpty() == true) {
                     MessageScreen(message, "Pinkie", uniqueKey)
                 }*/
-                MessageScreen(message, lastUserName, uniqueKey)
+                MessageScreen(message, lastUserName, uniqueKey, viewModel)
             }
         }
         /*LazyColumn {

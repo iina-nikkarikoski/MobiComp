@@ -55,54 +55,42 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import java.io.File
-
-
+import java.util.UUID
 
 
 @Composable
 fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = viewModel()) {
 
-    var text by remember { mutableStateOf("") }
-    var uri by remember { mutableStateOf<Uri?>(null) }
+    //var text by remember { mutableStateOf("") }
+    //var uri by remember { mutableStateOf<Uri?>(null) }
+    //var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    //var selectedUri2 by remember { mutableStateOf<Uri?>(null) }
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
     val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
-    var savedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var profilePic = allUsers.lastOrNull()?.picture.toString()
+
+    var text by remember { mutableStateOf("") }
+    var filename = ""
+    var path by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri = it }
-    )
-    val context = LocalContext.current
+        onResult = { newUri: Uri? ->
+            profilePic = newUri.toString()
+            filename = UUID.randomUUID().toString()
 
-    /*val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { selectedUri ->
-            uri = saveImageToStorage(context, selectedUri)
-        }
-    )*/
-    /*val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            if (uri != null) {
-                Log.d("PhotoPicker", "Selected URI: $uri")
-                val copiedFile = imageToStorage(context, context.contentResolver, uri)
-                if (copiedFile != null) {
-                    Log.d("PhotoPicker", "Image copied to internal storage: ${copiedFile.absolutePath}")
-                    state.description.value = copiedFile.absolutePath
-                    selectedImage = copiedFile
-                }
-
-                state.description.value?.let {filePath ->
-                    val profilePic = File(filePath)
-                    Image(
-                        painter = rememberImagePainter(profilePic),
-                        contentDescription = "Profile picture",
-
-                    )
-                }
+            newUri?.let {
+                val inputStream = context.contentResolver.openInputStream(newUri)
+                val outputFile = context.filesDir.resolve(filename)
+                inputStream?.copyTo(outputFile.outputStream())
+                path = outputFile.toString()
+                val user = User(name = text, picture = profilePic)
+                viewModel.insert(user)
             }
         }
-    )*/
+    )
 
     Box(
         modifier = Modifier
@@ -141,7 +129,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                             )
                         )
                     }),
-                painter = rememberAsyncImagePainter(uri),
+                painter = rememberAsyncImagePainter(profilePic),
                 contentDescription = null,
             )
 
@@ -155,8 +143,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         }
     }
 
-
-
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -164,10 +150,8 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     ) {
         Button(
             onClick = {
-                //savedUri = saveImageToStorage(context, uri)
-                val user = User(name = text, picture = uri.toString())
+                val user = User(name = text, picture = profilePic)
                 viewModel.insert(user)
-                //uri = savedUri
                 Log.d("Saving user", "User saved to database")
             },
             shape = RoundedCornerShape(20.dp),
@@ -183,62 +167,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         )
     }
 }
-/*fun saveImageToStorage(context: Context, imageUri: Uri?): Uri? {
-    if (imageUri == null) {
-        return null
-    }
-
-    // Create a unique filename for the image
-    val filename = "user_image_${System.currentTimeMillis()}.jpg"
-
-    try {
-        // Open an output stream to the app's files directory
-        context.openFileOutput(filename, Context.MODE_PRIVATE).use { outputStream ->
-            // Get the input stream from the image URI
-            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                // Copy the image data from the input stream to the output stream
-                inputStream.copyTo(outputStream)
-            }
-        }
-
-        // Return the saved image URI using FileProvider
-        return FileProvider.getUriForFile(context, "${context.packageName}.provider", File(context.filesDir, filename))
-    } catch (e: Exception) {
-        e.printStackTrace()
-        return null
-    }
-}*/
-
-/*fun loadImageFromStorage(context: Context, imageUri: Uri?): Painter {
-    return rememberDrawablePainter(imageUri)
-}*/
-
-/*fun saveImageToStorage(context: Context, imageUri: Uri?): Uri? {
-    if (imageUri == null) {
-        return null
-    }
-
-    // Create a unique filename for the image
-    val filename = "user_image_${System.currentTimeMillis()}.jpg"
-
-    // Open an output stream to the app's files directory
-    val outputStream: OutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE)
-
-    // Get the input stream from the image URI
-    val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
-
-    // Copy the image data from the input stream to the output stream
-    inputStream?.copyTo(outputStream)
-
-    // Close the streams
-    inputStream?.close()
-    outputStream.close()
-
-    Log.d("Saving image", "image saved to database")
-
-    // Return the saved image URI
-    return Uri.fromFile(File(context.filesDir, filename))
-}*/
 
 /*@Composable
 @Preview(showBackground = true)
