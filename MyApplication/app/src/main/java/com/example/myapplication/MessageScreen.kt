@@ -92,7 +92,7 @@ fun Settings(title: String, onSettingsClick: () -> Unit) {
 fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel: UserViewModel) {
 
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
-    var profilePic = allUsers.lastOrNull()?.picture.toString()
+    val profilePic = allUsers.lastOrNull()?.picture.toString()
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
             modifier = Modifier
@@ -101,12 +101,12 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
                 .border(1.5.dp, Color.Black, CircleShape),
             //painter = painterResource(R.drawable.pinkie),
             //painter = rememberAsyncImagePainter(profilePicture),
-            painter = rememberAsyncImagePainter(profilePic),
-            /*if(profilePic == null){
+            painter =
+            if(profilePic.isEmpty()){
                 painterResource(R.drawable.pinkie)
             } else {
-
-            },*/
+                rememberAsyncImagePainter(profilePic)
+            },
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))

@@ -1,13 +1,9 @@
 package com.example.myapplication
 
-import android.R
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
-import android.widget.ImageView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,17 +35,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -61,16 +54,12 @@ import java.util.UUID
 @Composable
 fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = viewModel()) {
 
-    //var text by remember { mutableStateOf("") }
-    //var uri by remember { mutableStateOf<Uri?>(null) }
-    //var selectedUri by remember { mutableStateOf<Uri?>(null) }
-    //var selectedUri2 by remember { mutableStateOf<Uri?>(null) }
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
     val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
     var profilePic = allUsers.lastOrNull()?.picture.toString()
 
     var text by remember { mutableStateOf("") }
-    var filename = ""
+    var filename: String
     var path by remember { mutableStateOf("") }
 
     val context = LocalContext.current
@@ -86,8 +75,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                 val outputFile = context.filesDir.resolve(filename)
                 inputStream?.copyTo(outputFile.outputStream())
                 path = outputFile.toString()
-                val user = User(name = text, picture = profilePic)
-                viewModel.insert(user)
             }
         }
     )
