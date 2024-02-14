@@ -1,9 +1,13 @@
 package com.example.myapplication
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.Manifest
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,12 +47,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import java.io.File
 import java.util.UUID
 
 
@@ -57,12 +64,42 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
     val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
     var profilePic = allUsers.lastOrNull()?.picture.toString()
+    val notificationService = NotificationService(LocalContext.current)
 
     var text by remember { mutableStateOf("") }
     var filename: String
     var path by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else true
+        )
+    }
+
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            hasNotificationPermission = isGranted
+            if (isGranted) {
+                // Permission granted, you can now show notifications
+                notificationService.showBasicNotification()
+            } else {
+                // Permission denied, handle accordingly (e.g., show a message to the user)
+                Toast.makeText(context, "Notification permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    LaunchedEffect(hasNotificationPermission) {
+        if (hasNotificationPermission) {
+            notificationService.showBasicNotification()
+        }
+    }
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -127,6 +164,21 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                 onValueChange = { text = it },
                 label = { Text("Change name") }
             )
+
+            Button(onClick = {
+                    //notificationService.showBasicNotification()
+                if (!hasNotificationPermission) {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    notificationService.showBasicNotification()
+                }
+            },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(text = "Enable notifications")
+            }
         }
     }
 
@@ -153,10 +205,11 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
             modifier = Modifier.padding(top = 16.dp)
         )
     }
+
 }
 
-/*@Composable
+@Composable
 @Preview(showBackground = true)
 fun ScreenPreview() {
-    SecondScreen(navController = rememberNavController())
-}*/
+    SecondScreen(navController = rememberNavController(), viewModel = viewModel())
+}

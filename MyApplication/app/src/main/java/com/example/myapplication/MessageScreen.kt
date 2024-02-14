@@ -47,15 +47,6 @@ import coil.compose.rememberAsyncImagePainter
 
 
 data class Message(val author: String, val body: String)
-
-/*val profilePicture = if (message.author.isNotEmpty()) {
-    // Use a custom profile picture if the author property is not empty
-    Uri.parse()
-} else {
-    // Use a default profile picture if the author property is empty
-    Uri.parse("android.resource://com.example.myapplication/${R.drawable.pinkie}")
-}*/
-
 @Composable
 fun Settings(title: String, onSettingsClick: () -> Unit) {
     Box(
@@ -99,8 +90,6 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
                 .size(40.dp)
                 .clip(CircleShape)
                 .border(1.5.dp, Color.Black, CircleShape),
-            //painter = painterResource(R.drawable.pinkie),
-            //painter = rememberAsyncImagePainter(profilePicture),
             painter =
             if(profilePic.isEmpty()){
                 painterResource(R.drawable.pinkie)
@@ -150,19 +139,9 @@ fun Conversation(navController: NavController, messages: List<Message>, viewMode
         LazyColumn {
             items(messages) { message ->
                 val uniqueKey = "${message.author}_${message.hashCode()}"
-                /*if (lastUserName?.isEmpty() == true) {
-                    MessageScreen(message, "Pinkie", uniqueKey)
-                }*/
                 MessageScreen(message, lastUserName, uniqueKey, viewModel)
             }
         }
-        /*LazyColumn {
-            items(messages) { message ->
-                // Concatenate the author's name with a unique identifier to create a distinct key
-                val uniqueKey = "${message.author}_${message.hashCode()}"
-                MessageScreen(message, uniqueKey)
-            }
-        }*/
     }
 }
 
