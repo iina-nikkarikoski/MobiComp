@@ -1,9 +1,12 @@
 package com.example.myapplication
 
 import android.Manifest
-import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -35,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -47,14 +51,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
 import java.util.UUID
 
 
@@ -65,12 +65,33 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
     var profilePic = allUsers.lastOrNull()?.picture.toString()
     val notificationService = NotificationService(LocalContext.current)
+    val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
     var text by remember { mutableStateOf("") }
     var filename: String
     var path by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+
+    val gyroscopeListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+            val rotationY = event.values[1]
+            if (rotationY > 1) {
+                notificationService.showRotationNotification(rotationY)
+            }
+        }
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        }
+    }
+
+    DisposableEffect(Unit) {
+        sensorManager.registerListener(gyroscopeListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL)
+
+        onDispose {
+            sensorManager.unregisterListener(gyroscopeListener)
+        }
+    }
 
     var hasNotificationPermission by remember {
         mutableStateOf(
@@ -87,10 +108,8 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             hasNotificationPermission = isGranted
             if (isGranted) {
-                // Permission granted, you can now show notifications
                 notificationService.showBasicNotification()
             } else {
-                // Permission denied, handle accordingly (e.g., show a message to the user)
                 Toast.makeText(context, "Notification permission denied", Toast.LENGTH_SHORT).show()
             }
         }
@@ -153,7 +172,8 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                             )
                         )
                     }),
-                painter = rememberAsyncImagePainter(profilePic),
+                //painter = rememberAsyncImagePainter(profilePic),
+                painter = painterResource(R.drawable.pinkie),
                 contentDescription = null,
             )
 
@@ -166,7 +186,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
             )
 
             Button(onClick = {
-                    //notificationService.showBasicNotification()
                 if (!hasNotificationPermission) {
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else {
@@ -200,16 +219,16 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
             Text(text = "SAVE")
         }
 
-        Text(
+        /*Text(
             text = "Text from the database: $lastUserName",
             modifier = Modifier.padding(top = 16.dp)
-        )
+        )*/
     }
 
 }
 
-@Composable
+/*@Composable
 @Preview(showBackground = true)
 fun ScreenPreview() {
     SecondScreen(navController = rememberNavController(), viewModel = viewModel())
-}
+}*/

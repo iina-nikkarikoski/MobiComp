@@ -90,12 +90,12 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
                 .size(40.dp)
                 .clip(CircleShape)
                 .border(1.5.dp, Color.Black, CircleShape),
-            painter =
-            if(profilePic.isEmpty()){
+            painter = painterResource(R.drawable.pinkie),
+            /*if(profilePic.isEmpty()){
                 painterResource(R.drawable.pinkie)
             } else {
                 rememberAsyncImagePainter(profilePic)
-            },
+            },*/
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))

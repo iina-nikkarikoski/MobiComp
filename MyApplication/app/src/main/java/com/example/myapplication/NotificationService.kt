@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -30,34 +29,48 @@ class NotificationService (private val context: Context) {
         }
     }
 
-
     fun showBasicNotification () {
+        val notificationIntent = Intent(context, MainActivity::class.java)
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, "channel_id")
             .setContentTitle("Super important notification")
             .setContentText("Go to sleep")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
+            .setContentIntent(pendingIntent)
             .build()
         Log.d("NOTIFICATION", "NOTIFICATION SENT")
 
-        notificationManager.notify(
-            Random.nextInt(),
-            notification
-        )
+        notificationManager.notify(Random.nextInt(), notification)
     }
-    /*fun scheduleNotification(delayMillis: Long) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        val notificationIntent = Intent(context, NotificationReceiver::class.java)
-        notificationIntent.action = "SHOW_NOTIFICATION"
-        val pendingIntent = PendingIntent.getBroadcast(
+    fun showRotationNotification(rotationY: Float) {
+        val notificationIntent = Intent(context, MainActivity::class.java)
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+        val pendingIntent = PendingIntent.getActivity(
             context,
             0,
             notificationIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Schedule the notification to appear after the specified delay
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMillis, pendingIntent)
-    }*/
+        val notification = NotificationCompat.Builder(context, "channel_id")
+            .setContentTitle("Device Rotation Detected")
+            .setContentText("Rotation value: $rotationY")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(Random.nextInt(), notification)
+    }
 }
