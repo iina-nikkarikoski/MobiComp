@@ -19,3 +19,15 @@ interface UserDao {
     @Query("SELECT * FROM users")
     fun getAllUsers(): LiveData<List<User>>
 }
+
+@Dao
+interface MessageDao {
+    @Insert
+    suspend fun insertMessage(messageDB: MessageDB)
+
+    @Query("SELECT * FROM messages ORDER BY id DESC LIMIT 1")
+    suspend fun getLastMessage(): MessageDB
+
+    @Query("SELECT * FROM messages")
+    fun getAllMessages(): LiveData<List<MessageDB>>
+}

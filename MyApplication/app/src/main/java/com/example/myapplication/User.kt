@@ -13,3 +13,13 @@ data class User(
     @ColumnInfo(name  = "pictureUri")
     val picture: String?
 )
+
+@Entity(tableName = "messages")
+data class MessageDB(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    @ColumnInfo(name = "username")
+    val name: String,
+    @ColumnInfo(name = "message")
+    val message: String
+)

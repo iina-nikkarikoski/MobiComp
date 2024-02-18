@@ -14,17 +14,28 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application): AndroidViewModel(application) {
     private val repository: UserRepository
+    private val messageRepo: MessageRepository
     val allUsers: LiveData<List<User>>
+    val allMessages: LiveData<List<MessageDB>>
 
     init {
         val userDao = UserDatabase.getDatabase(application).dao()
+        val messageDao = UserDatabase.getDatabase(application).messageDao()
         repository = UserRepository(userDao)
+        messageRepo = MessageRepository(messageDao)
         allUsers = repository.allUsers
+        allMessages = messageRepo.allMessages
     }
 
     fun insert(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.insert(user)
+        }
+    }
+
+    fun insertMessage(messageDB: MessageDB) {
+        viewModelScope.launch(Dispatchers.IO) {
+            messageRepo.insertMessage(messageDB)
         }
     }
 }

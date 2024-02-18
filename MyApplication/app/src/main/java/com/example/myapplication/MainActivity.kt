@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
                     composable(route = Screen.MessageScreen.route) {
                         Conversation(
                             navController = navController,
-                            SampleData.conversationSample,
                             viewModel = userViewModel
                         )
                     }

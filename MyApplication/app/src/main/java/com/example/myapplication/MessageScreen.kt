@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,13 +20,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,9 +54,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import kotlin.math.round
 
 
-data class Message(val author: String, val body: String)
+//data class Message(val author: String, val body: String)
 @Composable
 fun Settings(title: String, onSettingsClick: () -> Unit) {
     Box(
@@ -80,10 +91,55 @@ fun Settings(title: String, onSettingsClick: () -> Unit) {
 }
 
 @Composable
-fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel: UserViewModel) {
+fun Write (viewModel: UserViewModel = viewModel()) {
+    var text by remember { mutableStateOf("") }
+    val allUsers by viewModel.allUsers.observeAsState(emptyList())
+    val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+
+        Alignment.BottomCenter
+    ) {
+        Row (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text("Write message") },
+                modifier = Modifier
+                    .weight(1f)
+            )
+
+            IconButton(onClick = {
+                val message = MessageDB(name = lastUserName, message = text)
+                viewModel.insertMessage(message)
+                Log.d("Saving message", "Message saved to database")
+
+                text = ""
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = "Send",
+                    tint = Color.Magenta
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MessageScreen(msg: MessageDB, latestUserName: String?,  key: String, viewModel: UserViewModel) {
 
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
     val profilePic = allUsers.lastOrNull()?.picture.toString()
+
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
             modifier = Modifier
@@ -107,7 +163,7 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
 
         Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
             Text(
-                text = latestUserName ?: msg.author,
+                text = latestUserName ?: msg.name,
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.titleSmall
             )
@@ -121,7 +177,7 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
                     .animateContentSize()
                     .padding(1.dp)) {
                 Text(
-                    text = msg.body,
+                    text = msg.message,
                     modifier = Modifier.padding(all = 4.dp),
                     maxLines = if (isExpanded) Int.MAX_VALUE else 1,
                     style = MaterialTheme.typography.bodyMedium
@@ -130,25 +186,29 @@ fun MessageScreen(msg: Message, latestUserName: String?,  key: String, viewModel
         }
     }
 }
+
 @Composable
-fun Conversation(navController: NavController, messages: List<Message>, viewModel: UserViewModel) {
+fun Conversation(navController: NavController, viewModel: UserViewModel) {
     val allUsers by viewModel.allUsers.observeAsState(emptyList())
     val lastUserName = allUsers.lastOrNull()?.name ?: "Pinkie"
+    val messages by viewModel.allMessages.observeAsState(emptyList())
+
     Column {
         Settings(title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
         LazyColumn {
             items(messages) { message ->
-                val uniqueKey = "${message.author}_${message.hashCode()}"
+                val uniqueKey = "${message.name}_${message.hashCode()}"
                 MessageScreen(message, lastUserName, uniqueKey, viewModel)
             }
         }
+        Write(viewModel = viewModel)
     }
 }
 
 /**
  * SampleData for Jetpack Compose Tutorial
  */
-object SampleData {
+/*object SampleData {
     // Sample conversation data
 
     val conversationSample = listOf(
@@ -218,4 +278,4 @@ object SampleData {
             "Have you tried writing build.gradle with KTS?"
         ),
     )
-}
+}*/

@@ -9,3 +9,11 @@ class UserRepository (private val userDao: UserDao) {
         userDao.insert(user)
     }
 }
+
+class MessageRepository (private val messageDao: MessageDao) {
+    val allMessages: LiveData<List<MessageDB>> = messageDao.getAllMessages()
+
+    suspend fun insertMessage(messageDB: MessageDB) {
+        messageDao.insertMessage(messageDB)
+    }
+}
