@@ -26,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +60,7 @@ import kotlin.math.round
 
 //data class Message(val author: String, val body: String)
 @Composable
-fun Settings(title: String, onSettingsClick: () -> Unit) {
+fun Settings(title: String, onCameraClick: () -> Unit, onSettingsClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,6 +79,13 @@ fun Settings(title: String, onSettingsClick: () -> Unit) {
                 fontSize = 20.sp,
                 letterSpacing = 0.5.sp
             )
+            IconButton(onClick = onCameraClick) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Camera",
+                    tint = Color.White
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onSettingsClick) {
                 Icon(
@@ -194,7 +202,7 @@ fun Conversation(navController: NavController, viewModel: UserViewModel) {
     val messages by viewModel.allMessages.observeAsState(emptyList())
 
     Column {
-        Settings(title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
+        Settings(title = "Conversation", onCameraClick = {navController.navigate(route = Screen.Camera.route)}, onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
         LazyColumn {
             items(messages) { message ->
                 val uniqueKey = "${message.name}_${message.hashCode()}"

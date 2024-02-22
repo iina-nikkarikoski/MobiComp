@@ -101,7 +101,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     var path by remember { mutableStateOf("") }
     var isPopupVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val controller = remember {LifecycleCameraController(applicationContext)}
+    //val controller = remember {LifecycleCameraController(applicationContext)}
 
     val gyroscopeListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {

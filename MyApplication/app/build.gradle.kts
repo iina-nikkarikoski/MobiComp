@@ -65,6 +65,10 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.compose.ui:ui:1.6.2")
+    implementation("androidx.compose.material3:material3:1.5.1")
+    implementation("androidx.compose.material3:material3-icons-core:1.5.1")
+
 
     val room_version= "2.6.1"
     implementation("androidx.room:room-ktx:$room_version")
