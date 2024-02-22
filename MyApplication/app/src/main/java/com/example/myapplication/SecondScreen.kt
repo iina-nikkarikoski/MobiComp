@@ -166,7 +166,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         }
     }
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+    /*val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
@@ -174,7 +174,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         } else {
             Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
-    }
+    }*/
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),

@@ -56,6 +56,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import kotlin.math.round
+import androidx.compose.material.icons.filled.PhotoCamera
 
 
 //data class Message(val author: String, val body: String)
@@ -79,14 +80,14 @@ fun Settings(title: String, onCameraClick: () -> Unit, onSettingsClick: () -> Un
                 fontSize = 20.sp,
                 letterSpacing = 0.5.sp
             )
+            Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onCameraClick) {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    imageVector = Icons.Default.PhotoCamera,
                     contentDescription = "Camera",
                     tint = Color.White
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     imageVector = Icons.Default.Settings,

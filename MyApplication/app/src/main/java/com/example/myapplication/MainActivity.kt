@@ -20,9 +20,6 @@ class MainActivity : ComponentActivity() {
                 val userViewModel: UserViewModel by viewModels {
                     ViewModelFactory(application)
                 }
-                /*val cameraViewModel: CameraViewModel by viewModels {
-                    ViewModelFactory(application)
-                }*/
 
                 NavHost(
                     navController = navController,
@@ -37,9 +34,9 @@ class MainActivity : ComponentActivity() {
                     composable(route = Screen.SecondScreen.route) {
                         SecondScreen(navController = navController, viewModel = userViewModel)
                     }
-                    /*composable(route = Screen.Camera.route) {
-                        Camera(navController = navController, viewModel = cameraViewModel)
-                    }*/
+                    composable(route = Screen.Camera.route) {
+                        Camera()
+                    }
                 }
             }
         }
