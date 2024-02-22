@@ -49,9 +49,9 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.0")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -66,8 +66,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.ui:ui:1.6.2")
-    implementation("androidx.compose.material3:material3:1.5.1")
-    implementation("androidx.compose.material3:material3-icons-core:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.6.2")
 
 
     val room_version= "2.6.1"
@@ -75,25 +74,25 @@ dependencies {
     kapt("androidx.room:room-compiler:$room_version")
 
     //Coroutines
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 //Lifecycle Components
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 //Annotation processor
-    kapt("androidx.lifecycle:lifecycle-compiler:2.2.0")
+    kapt("androidx.lifecycle:lifecycle-compiler:2.7.0")
 //Room
-    implementation("androidx.room:room-runtime:2.2.5")
-    kapt("androidx.room:room-compiler:2.2.5")
-    implementation("androidx.room:room-ktx:2.2.5")
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    val nav_version = "2.7.6"
+    val nav_version = "2.7.7"
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.navigation:navigation-fragment:$nav_version")
     implementation("androidx.navigation:navigation-ui:$nav_version")
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
@@ -101,9 +100,9 @@ dependencies {
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
 
-    implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
 
     val cameraxVersion = "1.3.0-rc01"
 
@@ -111,7 +110,8 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-video:$cameraxVersion")
-
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
+    implementation("androidx.compose.material3:material3:1.2.0")
 }
