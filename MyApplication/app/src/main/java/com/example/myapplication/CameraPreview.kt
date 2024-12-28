@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.util.Log
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ fun CameraPreview(
     controller: LifecycleCameraController,
     modifier: Modifier = Modifier
 ) {
+    Log.d("CAMERA", "IN PREVIEW")
     val lifecycleOwner = LocalLifecycleOwner.current
     AndroidView(
         factory = {

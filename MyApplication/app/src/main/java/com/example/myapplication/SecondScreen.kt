@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -10,25 +9,17 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -58,19 +49,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 
 
@@ -88,9 +74,7 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
     var text by remember { mutableStateOf("") }
     var filename: String
     var path by remember { mutableStateOf("") }
-    var isPopupVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    //val controller = remember {LifecycleCameraController(applicationContext)}
 
     val gyroscopeListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
@@ -127,29 +111,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         )
     }
 
-    /*val hasCameraPermission by remember {
-        mutableStateOf(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
-            } else true
-        )
-    }
-
-    val cameraResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            if (success) {
-                // Update profilePic with the taken picture
-                //viewModel.updateProfilePic()
-            } else {
-                // Handle the case when the picture was not successfully taken
-            }
-        }
-    )**/
-
     val notificationPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             hasNotificationPermission = isGranted
@@ -166,16 +127,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         }
     }
 
-    /*val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            //photoPicker.launch(MediaStore.ACTION_IMAGE_CAPTURE)
-        } else {
-            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }*/
-
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { newUri: Uri? ->
@@ -191,7 +142,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
         }
     )
 
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,68 +155,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                 contentDescription = "Back",
                 tint = Color.White
             )
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-    ) {
-        // Popup content
-        AnimatedVisibility(
-            visible = isPopupVisible,
-            enter = slideInVertically(
-                initialOffsetY = { fullHeight -> fullHeight },
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { fullHeight -> fullHeight },
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.DarkGray)
-                    .zIndex(0f)
-                    .padding(10.dp, 40.dp),
-                Alignment.TopCenter
-            ) {
-                Row {
-                    Button(
-                        onClick = {
-                            photoPicker.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                            isPopupVisible = false
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        Text("From Gallery")
-                    }
-                    Button(
-                        onClick = {
-                            /*if (!hasCameraPermission) {
-                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                            } else {
-                                cameraResultLauncher.launch(null)
-                            }
-                            isPopupVisible = false*/
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        Text("From Camera")
-                    }
-                }
-
-            }
         }
     }
 
@@ -286,10 +174,14 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
                     .clip(CircleShape)
                     .border(1.5.dp, Color.Black, CircleShape)
                     .clickable(onClick = {
-                        isPopupVisible = true
+                        photoPicker.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
                     }),
-                painter = rememberAsyncImagePainter(profilePic),
-                //painter = painterResource(R.drawable.pinkie),
+                //painter = rememberAsyncImagePainter(profilePic),
+                painter = painterResource(R.drawable.pinkie),
                 contentDescription = null,
             )
 
@@ -345,39 +237,6 @@ fun SecondScreen(navController: NavHostController, viewModel: UserViewModel = vi
 }
 
 /*@Composable
-fun getOutputMediaFileUri(context: Context): Uri {
-    val mediaStorageDir = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "YourAppDirectoryName")
-    if (!mediaStorageDir.exists()) {
-        mediaStorageDir.mkdirs()
-    }
-    val filename = "${UUID.randomUUID()}.jpg"
-    val file = File(mediaStorageDir, filename)
-
-    // Save the captured image to the file
-    val outputStream = FileOutputStream(file)
-   //val takenImage = getCameraImage(context) // You'll need to implement this function to get the taken image
-    //takenImage?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-    outputStream.flush()
-    outputStream.close()
-
-    // Add the image to the gallery
-    addImageToGallery(context, file)
-
-    return Uri.fromFile(file)
-}
-
-private fun addImageToGallery(context: Context, file: File) {
-    val values = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, file.name)
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-        put(MediaStore.Images.Media.DATA, file.absolutePath)
-    }
-
-    context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-}
-
-@Composable
 @Preview(showBackground = true)
 fun ScreenPreview() {
     SecondScreen(navController = rememberNavController(), viewModel = viewModel())

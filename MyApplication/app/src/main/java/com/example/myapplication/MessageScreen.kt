@@ -20,21 +20,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,22 +40,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
-import kotlin.math.round
 import androidx.compose.material.icons.filled.PhotoCamera
-
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.rememberAsyncImagePainter
 
 //data class Message(val author: String, val body: String)
 @Composable
-fun Settings(title: String, onCameraClick: () -> Unit, onSettingsClick: () -> Unit) {
+fun Settings(navController: NavController, title: String, onSettingsClick: () -> Unit) {
+    val context = LocalContext.current
+    val hasCameraPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            } else true
+        )
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            navController.navigate(route = Screen.Camera.route)
+        } else {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,7 +97,15 @@ fun Settings(title: String, onCameraClick: () -> Unit, onSettingsClick: () -> Un
                 letterSpacing = 0.5.sp
             )
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = onCameraClick) {
+            IconButton(
+                onClick = {
+                    if (!hasCameraPermission) {
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    } else {
+                        navController.navigate(route = Screen.Camera.route)
+                    }
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.PhotoCamera,
                     contentDescription = "Camera",
@@ -156,11 +180,11 @@ fun MessageScreen(msg: MessageDB, latestUserName: String?,  key: String, viewMod
                 .clip(CircleShape)
                 .border(1.5.dp, Color.Black, CircleShape),
             painter = painterResource(R.drawable.pinkie),
-            /*if(profilePic.isEmpty()){
-                painterResource(R.drawable.pinkie)
-            } else {
-                rememberAsyncImagePainter(profilePic)
-            },*/
+            /*painter = if(profilePic.isEmpty()){
+                            painterResource(R.drawable.pinkie)
+                        } else {
+                            rememberAsyncImagePainter(profilePic)
+                        },*/
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -203,7 +227,7 @@ fun Conversation(navController: NavController, viewModel: UserViewModel) {
     val messages by viewModel.allMessages.observeAsState(emptyList())
 
     Column {
-        Settings(title = "Conversation", onCameraClick = {navController.navigate(route = Screen.Camera.route)}, onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
+        Settings(navController,title = "Conversation", onSettingsClick = {navController.navigate(route = Screen.SecondScreen.route)})
         LazyColumn {
             items(messages) { message ->
                 val uniqueKey = "${message.name}_${message.hashCode()}"
